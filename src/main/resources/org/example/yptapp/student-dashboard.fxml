@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.yptapp.controller.StudentDashboardController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Шапка -->
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to right, #1a237e, #00838f); -fx-background-radius: 16; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);">
+        <VBox>
+            <Label fx:id="welcomeLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Привет!" />
+            <VBox spacing="5">
+                <Label fx:id="levelLabel" style="-fx-font-size: 13px; -fx-text-fill: #80cbc4;"/>
+                <Label fx:id="goalsLabel" style="-fx-font-size: 12px; -fx-text-fill: #b2ebf2;"/>
+            </VBox>
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #80cbc4;" text="Твой учебный дашборд" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#openCalendar" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="📅 Календарь" />
+        <Button onAction="#logout" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="Выйти" />
+    </HBox>
+
+    <HBox spacing="15" VBox.vgrow="ALWAYS">
+        <!-- Левая колонка -->
+        <VBox spacing="15" HBox.hgrow="ALWAYS">
+            <!-- Таймер -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="⏱ Таймер учёбы" />
+
+                <HBox alignment="CENTER" spacing="20">
+                    <ComboBox fx:id="subjectCombo" prefWidth="220" promptText="Выберите предмет" style="-fx-background-radius: 10; -fx-padding: 5;" />
+
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label fx:id="timerLabel" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #00838f; -fx-font-family: 'Courier New', monospace;" text="00:00:00" />
+                        <Label style="-fx-font-size: 11px; -fx-text-fill: #90a4ae;" text="часы : минуты : секунды" />
+                    </VBox>
+
+                    <Button fx:id="timerButton" onAction="#toggleTimer" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 40; -fx-font-size: 16px; -fx-cursor: hand;" text="▶ Старт" />
+                </HBox>
+            </VBox>
+            <!-- Статистика учёбы -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="📈 Статистика"/>
+                <Label fx:id="studyStatsLabel" style="-fx-font-size: 14px; -fx-text-fill: #546e7a;" text="Загрузка..."/>
+            </VBox>
+            <!-- Расписание на сегодня -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="📅 Сегодня" />
+                <VBox fx:id="scheduleBox" spacing="8" />
+            </VBox>
+        </VBox>
+
+        <!-- Правая колонка -->
+        <VBox spacing="15" prefWidth="380">
+            <!-- Прогресс -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="📊 Мой прогресс" />
+                <VBox fx:id="progressBox" spacing="12" />
+            </VBox>
+            <!-- Достижения -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="🏆 Достижения"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="notifBadge" style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-padding: 2 8; -fx-background-radius: 10; -fx-font-weight: bold;" text=""/>
+                </HBox>
+                <VBox fx:id="achievementsBox" spacing="8"/>
+            </VBox>
+            <!-- Учебники -->
+            <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);" VBox.vgrow="ALWAYS">
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="📚 Материалы" />
+                <ListView fx:id="materialsList" VBox.vgrow="ALWAYS" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0;" />
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

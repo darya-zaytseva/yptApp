@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.yptapp.controller.MaterialsController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="Учебные материалы" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#back" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;" text="← Назад" />
+    </HBox>
+
+    <HBox fx:id="adminPanel" spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+        <ComboBox fx:id="subjectCombo" prefWidth="160" promptText="Предмет" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0;" />
+        <TextField fx:id="titleField" prefWidth="220" promptText="Название материала" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;" />
+        <Button fx:id="uploadButton" onAction="#chooseFile" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" text="📁 Выбрать файл" />
+        <Button onAction="#upload" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" text="⬆ Загрузить" />
+    </HBox>
+
+    <TableView fx:id="table" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #e0e0e0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colSubject" prefWidth="160" text="Предмет" />
+            <TableColumn fx:id="colTitle" prefWidth="320" text="Название" />
+            <TableColumn fx:id="colFile" prefWidth="220" text="Файл" />
+        </columns>
+    </TableView>
+
+    <HBox spacing="12">
+        <Button onAction="#openFile" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 25; -fx-font-size: 13px; -fx-cursor: hand;" text="📖 Открыть" />
+        <Button onAction="#delete" style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 25; -fx-font-size: 13px; -fx-cursor: hand;" text="🗑 Удалить" />
+    </HBox>
+</VBox>

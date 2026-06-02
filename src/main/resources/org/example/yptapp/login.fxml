@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #1a237e, #00838f);" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.yptapp.controller.LoginController">
+    <padding>
+        <Insets bottom="50" left="50" right="50" top="50" />
+    </padding>
+
+    <Label style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;" text="YPT" />
+    <Label style="-fx-font-size: 16px; -fx-text-fill: #80deea;" text="Учебная группа" />
+
+    <Pane prefHeight="20" />
+
+    <TextField fx:id="usernameField" prefWidth="280" promptText="Логин" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-prompt-text-fill: #b2ebf2; -fx-background-radius: 8; -fx-padding: 12;" />
+    <PasswordField fx:id="passwordField" prefWidth="280" promptText="Пароль" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-prompt-text-fill: #b2ebf2; -fx-background-radius: 8; -fx-padding: 12;" />
+
+    <Button maxWidth="280" onAction="#handleLogin" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 12; -fx-cursor: hand;" text="ВОЙТИ" />
+
+    <Pane prefHeight="10" />
+
+    <Label style="-fx-text-fill: #80cbc4; -fx-font-size: 11px;" text="admin / admin123  |  teacher / teacher123" />
+    <Button onAction="#openRegister" style="-fx-background-color: transparent; -fx-text-fill: #80deea; -fx-cursor: hand;" text="Нет аккаунта? Зарегистрироваться"/>
+</VBox>
