@@ -5,8 +5,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.example.yptapp.dao.StudentDAO;
 import org.example.yptapp.model.Student;
+import org.example.yptapp.service.AuthService;
 import org.example.yptapp.util.DBConnection;
 import org.example.yptapp.util.SceneManager;
 
@@ -53,6 +53,10 @@ public class RegisterController {
             showAlert("Пароль должен быть минимум 6 символов");
             return;
         }
+        if (username.length() < 3) {
+            showAlert("Логин должен быть минимум 3 символа");
+            return;
+        }
 
         try {
             if (role.equals("student")) {
@@ -72,58 +76,68 @@ public class RegisterController {
     }
 
     private void registerStudent(String username, String password, String fullName) throws SQLException {
-        Connection conn = DBConnection.getConnection();
-        conn.setAutoCommit(false);
-        try {
-            // 1. Создаём пользователя
-            String sqlUser = "INSERT INTO users (username, password_hash, role, full_name, level) VALUES (?, SHA2(?, 256), 'student', ?, 'beginner')";
-            PreparedStatement psUser = conn.prepareStatement(sqlUser, java.sql.Statement.RETURN_GENERATED_KEYS);
-            psUser.setString(1, username);
-            psUser.setString(2, password);
-            psUser.setString(3, fullName);
-            psUser.executeUpdate();
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                String hashedPassword = AuthService.hashPassword(password);
 
-            ResultSet rs = psUser.getGeneratedKeys();
-            int userId = -1;
-            if (rs.next()) userId = rs.getInt(1);
+                // 1. Создаём пользователя
+                String sqlUser = "INSERT INTO users (username, password_hash, role, full_name, level) VALUES (?, ?, 'student', ?, 'beginner')";
+                int userId;
+                try (PreparedStatement psUser = conn.prepareStatement(sqlUser, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                    psUser.setString(1, username);
+                    psUser.setString(2, hashedPassword);
+                    psUser.setString(3, fullName);
+                    psUser.executeUpdate();
 
-            // 2. Создаём студента
-            Student s = new Student();
-            s.setUserId(userId);
-            s.setFirstName(firstNameField.getText().trim().isEmpty() ? fullName.split(" ")[0] : firstNameField.getText().trim());
-            s.setLastName(lastNameField.getText().trim().isEmpty() ? fullName.split(" ")[0] : lastNameField.getText().trim());
-            s.setMiddleName(middleNameField.getText().trim());
-            s.setPhone(phoneField.getText().trim());
-            s.setEmail(emailField.getText().trim());
-            s.setGroupId(1); // По умолчанию первая группа
+                    try (ResultSet rs = psUser.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            userId = rs.getInt(1);
+                        } else {
+                            throw new SQLException("Не удалось получить ID созданного пользователя");
+                        }
+                    }
+                }
 
-            String sqlStudent = "INSERT INTO students (user_id, group_id, first_name, last_name, middle_name, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement psStudent = conn.prepareStatement(sqlStudent, java.sql.Statement.RETURN_GENERATED_KEYS);
-            psStudent.setInt(1, userId);
-            psStudent.setInt(2, s.getGroupId());
-            psStudent.setString(3, s.getFirstName());
-            psStudent.setString(4, s.getLastName());
-            psStudent.setString(5, s.getMiddleName());
-            psStudent.setString(6, s.getPhone());
-            psStudent.setString(7, s.getEmail());
-            psStudent.executeUpdate();
+                // 2. Создаём студента
+                Student s = new Student();
+                s.setUserId(userId);
+                s.setFirstName(firstNameField.getText().trim().isEmpty() ? fullName.split(" ")[0] : firstNameField.getText().trim());
+                s.setLastName(lastNameField.getText().trim().isEmpty() ? fullName.split(" ")[0] : lastNameField.getText().trim());
+                s.setMiddleName(middleNameField.getText().trim());
+                s.setPhone(phoneField.getText().trim());
+                s.setEmail(emailField.getText().trim());
+                s.setGroupId(1);
 
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
-            conn.close();
+                String sqlStudent = "INSERT INTO students (user_id, group_id, first_name, last_name, middle_name, phone, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement psStudent = conn.prepareStatement(sqlStudent)) {
+                    psStudent.setInt(1, userId);
+                    psStudent.setInt(2, s.getGroupId());
+                    psStudent.setString(3, s.getFirstName());
+                    psStudent.setString(4, s.getLastName());
+                    psStudent.setString(5, s.getMiddleName());
+                    psStudent.setString(6, s.getPhone());
+                    psStudent.setString(7, s.getEmail());
+                    psStudent.executeUpdate();
+                }
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         }
     }
 
     private void registerTeacher(String username, String password, String fullName) throws SQLException {
-        String sql = "INSERT INTO users (username, password_hash, role, full_name) VALUES (?, SHA2(?, 256), 'teacher', ?)";
+        String hashedPassword = AuthService.hashPassword(password);
+        String sql = "INSERT INTO users (username, password_hash, role, full_name) VALUES (?, ?, 'teacher', ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, hashedPassword);
             ps.setString(3, fullName);
             ps.executeUpdate();
         }

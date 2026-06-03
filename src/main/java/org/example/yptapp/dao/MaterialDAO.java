@@ -43,6 +43,19 @@ public class MaterialDAO {
         }
     }
 
+    /** Перегруженный метод для использования в транзакции */
+    public void add(Connection conn, Material m) throws SQLException {
+        String sql = "INSERT INTO materials (subject_id, title, file_path, file_name, file_type) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, m.getSubjectId());
+            ps.setString(2, m.getTitle());
+            ps.setString(3, m.getFilePath());
+            ps.setString(4, m.getFileName());
+            ps.setString(5, m.getFileType());
+            ps.executeUpdate();
+        }
+    }
+
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM materials WHERE id=?";
         try (Connection conn = DBConnection.getConnection();

@@ -43,12 +43,19 @@ public class FriendshipDAO {
     }
 
     public void sendRequest(int fromUserId, int toUserId) throws SQLException {
-        String sql = "INSERT INTO friendships (user_id_1, user_id_2, status) VALUES (?, ?, 'request') " +
-                "ON DUPLICATE KEY UPDATE status='request'";
+        // Сохраняем направленность: меньший ID = user_id_1, больший = user_id_2
+        // Добавляем поле initiator_id чтобы знать, кто отправил заявку
+        int u1 = Math.min(fromUserId, toUserId);
+        int u2 = Math.max(fromUserId, toUserId);
+
+        String sql = "INSERT INTO friendships (user_id_1, user_id_2, status, initiator_id) VALUES (?, ?, 'request', ?) " +
+                "ON DUPLICATE KEY UPDATE status=CASE WHEN status='blocked' THEN 'blocked' ELSE 'request' END, initiator_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, Math.min(fromUserId, toUserId));
-            ps.setInt(2, Math.max(fromUserId, toUserId));
+            ps.setInt(1, u1);
+            ps.setInt(2, u2);
+            ps.setInt(3, fromUserId);
+            ps.setInt(4, fromUserId);
             ps.executeUpdate();
         }
     }

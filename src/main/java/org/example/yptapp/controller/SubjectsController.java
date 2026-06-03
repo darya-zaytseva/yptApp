@@ -47,15 +47,40 @@ public class SubjectsController implements Initializable {
     }
 
     @FXML private void add() {
-        Subject s = new Subject(0, nameField.getText(), codeField.getText(), hoursSpinner.getValue());
+        String name = nameField.getText() != null ? nameField.getText().trim() : "";
+        String code = codeField.getText() != null ? codeField.getText().trim() : "";
+
+        if (name.isEmpty()) {
+            showAlert("Название предмета обязательно");
+            return;
+        }
+        if (code.isEmpty()) {
+            showAlert("Код предмета обязателен");
+            return;
+        }
+
+        Subject s = new Subject(0, name, code, hoursSpinner.getValue());
         try { dao.add(s); load(); clear(); }
         catch (SQLException e) { showAlert(e.getMessage()); }
     }
 
     @FXML private void update() {
         if (selected == null) return;
-        selected.setName(nameField.getText());
-        selected.setCode(codeField.getText());
+
+        String name = nameField.getText() != null ? nameField.getText().trim() : "";
+        String code = codeField.getText() != null ? codeField.getText().trim() : "";
+
+        if (name.isEmpty()) {
+            showAlert("Название предмета обязательно");
+            return;
+        }
+        if (code.isEmpty()) {
+            showAlert("Код предмета обязателен");
+            return;
+        }
+
+        selected.setName(name);
+        selected.setCode(code);
         selected.setHours(hoursSpinner.getValue());
         try { dao.update(selected); load(); }
         catch (SQLException e) { showAlert(e.getMessage()); }

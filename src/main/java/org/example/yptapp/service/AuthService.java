@@ -2,18 +2,28 @@ package org.example.yptapp.service;
 
 import org.example.yptapp.model.UserSession;
 import org.example.yptapp.util.DBConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class AuthService {
+    private static final String FIXED_SALT = "ypt_salt_2026_v2";
+
     public static boolean login(String username, String password) {
-        String sql = "SELECT id, username, role, full_name, avatar_url, interests, goals, level, location " +
-                "FROM users WHERE username=? AND password_hash=SHA2(?, 256)";
+        String sql = "SELECT id, username, role, full_name, avatar_url, interests, goals, level, location, password_hash " +
+                "FROM users WHERE username=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                String inputHash = hashPassword(password);
+
+                if (!storedHash.equalsIgnoreCase(inputHash)) {
+                    return false;
+                }
+
                 UserSession s = UserSession.getInstance();
                 s.setUserId(rs.getInt("id"));
                 s.setUsername(rs.getString("username"));
@@ -37,7 +47,6 @@ public class AuthService {
     }
 
     private static void findStudentId(UserSession session) {
-        // Сначала ищем по user_id (надёжно)
         String sql = "SELECT id FROM students WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -51,7 +60,6 @@ public class AuthService {
             e.printStackTrace();
         }
 
-        // Fallback по ФИО (для обратной совместимости со старыми данными)
         String sqlFallback = "SELECT id FROM students WHERE first_name=? AND last_name=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sqlFallback)) {
@@ -64,6 +72,22 @@ public class AuthService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(FIXED_SALT.getBytes());
+            byte[] hash = md.digest(password.getBytes());
+            // Возвращаем hex-строку (как MySQL SHA2), не Base64!
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
         }
     }
 }

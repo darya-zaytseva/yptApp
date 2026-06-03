@@ -4,12 +4,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import org.example.yptapp.dao.GroupDAO;
 import org.example.yptapp.dao.ScheduleDAO;
+import org.example.yptapp.dao.StudentDAO;
+import org.example.yptapp.model.Group;
 import org.example.yptapp.model.Schedule;
+import org.example.yptapp.model.Student;
 import org.example.yptapp.model.UserSession;
 import org.example.yptapp.util.SceneManager;
 
@@ -23,10 +28,14 @@ public class CalendarController implements Initializable {
     @FXML private GridPane calendarGrid;
     @FXML private Label monthLabel;
     @FXML private HBox weekHeader;
+    @FXML private ComboBox<Group> groupFilterCombo;
 
     private ScheduleDAO scheduleDao = new ScheduleDAO();
+    private GroupDAO groupDao = new GroupDAO();
+    private StudentDAO studentDao = new StudentDAO();
     private LocalDate currentWeek = LocalDate.now();
     private Map<Integer, List<Schedule>> weekSchedule = new HashMap<>();
+    private Group currentGroupFilter = null;
 
     private final String[] dayNames = {"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"};
     private final Color[] subjectColors = {
@@ -36,7 +45,36 @@ public class CalendarController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        setupGroupFilter();
         loadWeek();
+    }
+
+    private void setupGroupFilter() {
+        try {
+            var groups = groupDao.getAll();
+            groupFilterCombo.setItems(javafx.collections.FXCollections.observableArrayList(groups));
+
+            UserSession session = UserSession.getInstance();
+            if (session.isStudent() && session.getStudentId() != null) {
+                Student student = studentDao.getByUserId(session.getUserId());
+                if (student != null && student.getGroupId() > 0) {
+                    for (Group g : groups) {
+                        if (g.getId() == student.getGroupId()) {
+                            currentGroupFilter = g;
+                            groupFilterCombo.setValue(g);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            groupFilterCombo.setOnAction(e -> {
+                currentGroupFilter = groupFilterCombo.getValue();
+                loadWeek();
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadWeek() {
@@ -46,18 +84,19 @@ public class CalendarController implements Initializable {
         LocalDate weekStart = currentWeek.with(java.time.DayOfWeek.MONDAY);
         monthLabel.setText(weekStart.format(DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("ru"))));
 
-        // Загрузка расписания
         try {
             var all = scheduleDao.getAll();
             weekSchedule.clear();
             for (Schedule s : all) {
+                if (currentGroupFilter != null && s.getGroupId() != currentGroupFilter.getId()) {
+                    continue;
+                }
                 weekSchedule.computeIfAbsent(s.getDayOfWeek(), k -> new ArrayList<>()).add(s);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Шапка дней
         for (int i = 0; i < 7; i++) {
             LocalDate day = weekStart.plusDays(i);
             boolean isToday = day.equals(LocalDate.now());
@@ -89,7 +128,6 @@ public class CalendarController implements Initializable {
             weekHeader.getChildren().add(dayBox);
         }
 
-        // Сетка времени (8:00 - 20:00)
         for (int hour = 8; hour <= 20; hour++) {
             Label timeLabel = new Label(String.format("%02d:00", hour));
             timeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #90a4ae;");
@@ -97,32 +135,26 @@ public class CalendarController implements Initializable {
             calendarGrid.add(timeLabel, 0, hour - 8);
         }
 
-        // События по дням
         for (int day = 1; day <= 7; day++) {
-            VBox dayColumn = new VBox(8);
-            dayColumn.setPadding(new Insets(5));
-
             List<Schedule> events = weekSchedule.getOrDefault(day, new ArrayList<>());
-            for (Schedule event : events) {
-                VBox card = createEventCard(event, day - 1);
-                dayColumn.getChildren().add(card);
+            for (int i = 0; i < events.size(); i++) {
+                Schedule event = events.get(i);
+                int row = Math.min(event.getPairNumber() - 1, 12);
+                VBox card = createEventCard(event, i);
+                calendarGrid.add(card, day, row);
             }
-
-            calendarGrid.add(dayColumn, day, 0, 1, 13);
         }
     }
 
     private VBox createEventCard(Schedule event, int colorIndex) {
         VBox card = new VBox(3);
         card.setPadding(new Insets(10));
-        card.setStyle("-fx-background-color: " + toHex(subjectColors[colorIndex % subjectColors.length]) +
-                "20; -fx-background-radius: 10; -fx-border-color: " +
-                toHex(subjectColors[colorIndex % subjectColors.length]) +
-                "; -fx-border-radius: 10; -fx-border-width: 2;");
+        String colorHex = toHex(subjectColors[colorIndex % subjectColors.length]);
+        card.setStyle("-fx-background-color: " + colorHex + "20; -fx-background-radius: 10; -fx-border-color: " +
+                colorHex + "; -fx-border-radius: 10; -fx-border-width: 2;");
 
         Label subject = new Label(event.getSubjectName());
-        subject.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " +
-                toHex(subjectColors[colorIndex % subjectColors.length]) + ";");
+        subject.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " + colorHex + ";");
 
         Label details = new Label(event.getPairNumber() + " пара • " + event.getRoom());
         details.setStyle("-fx-font-size: 11px; -fx-text-fill: #546e7a;");

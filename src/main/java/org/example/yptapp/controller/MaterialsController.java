@@ -92,7 +92,7 @@ public class MaterialsController implements Initializable {
         Connection conn = null;
         try {
             conn = org.example.yptapp.util.DBConnection.getConnection();
-            conn.setAutoCommit(false); // Транзакция
+            conn.setAutoCommit(false);
 
             Files.createDirectories(BASE_DIR);
             String storedName = System.currentTimeMillis() + "_" + selectedFile.getName();
@@ -102,16 +102,21 @@ public class MaterialsController implements Initializable {
             Material m = new Material();
             m.setSubjectId(subjectCombo.getValue().getId());
             m.setTitle(titleField.getText());
-            m.setFilePath(target.toString()); // Абсолютный путь пока оставим, но уникальное имя
+            m.setFilePath(target.toString());
             m.setFileName(selectedFile.getName());
-            m.setFileType(selectedFile.getName().substring(selectedFile.getName().lastIndexOf(".") + 1));
 
-            dao.add(m); // нужно передать conn для транзакции, но текущий DAO не поддерживает это
-            // Для полной транзакции нужно перегрузить dao.add(Connection, Material)
+            // Безопасное определение расширения файла
+            String fileName = selectedFile.getName();
+            int lastDot = fileName.lastIndexOf(".");
+            String fileType = (lastDot > 0) ? fileName.substring(lastDot + 1) : "";
+            m.setFileType(fileType);
+
+            // Используем перегруженный метод с Connection для транзакции
+            dao.add(conn, m);
 
             conn.commit();
 
-            // Уведомление всем студентам (упрощённо)
+            // Уведомление текущему пользователю
             Notification n = new Notification();
             n.setUserId(UserSession.getInstance().getUserId());
             n.setTitle("Новый материал");
@@ -123,10 +128,14 @@ public class MaterialsController implements Initializable {
             uploadButton.setText("📁 Выбрать файл");
             selectedFile = null;
         } catch (IOException | SQLException e) {
-            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
             showAlert("Ошибка загрузки: " + e.getMessage());
         } finally {
-            if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException ex) { ex.printStackTrace(); }
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
         }
     }
 

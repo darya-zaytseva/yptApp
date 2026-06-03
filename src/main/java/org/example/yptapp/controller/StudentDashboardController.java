@@ -54,7 +54,6 @@ public class StudentDashboardController implements Initializable {
         session = UserSession.getInstance();
         welcomeLabel.setText("Привет, " + session.getFullName() + "!");
 
-        // Показываем уровень и цели из профиля
         levelLabel.setText("Уровень: " + (session.getLevel() != null ? session.getLevel() : "beginner"));
         goalsLabel.setText("Цели: " + (session.getGoals() != null ? session.getGoals() : "Не указаны"));
 
@@ -87,9 +86,11 @@ public class StudentDashboardController implements Initializable {
 
     private void loadProgress() {
         progressBox.getChildren().clear();
-        if (session.getStudentId() == null) return;
+        if (session.getStudentId() == null) {
+            progressBox.getChildren().add(new Label("Прогресс недоступен: не найдена связь со студентом"));
+            return;
+        }
         try {
-            // Обновляем прогресс для ВСЕХ предметов, а не только для subject_id=0
             progressDao.updateProgressForAllSubjects(session.getStudentId());
             var list = progressDao.getByStudent(session.getStudentId());
             for (Progress p : list) {
@@ -108,10 +109,12 @@ public class StudentDashboardController implements Initializable {
 
         HBox stats = new HBox(20);
         double percent = p.getCompletionPercent();
-        Arc arc = new Arc(30, 30, 25, 25, 90, -percent * 3.6);
-        arc.setType(ArcType.ROUND);
-        arc.setFill(Color.web("#00838f"));
-        Circle bg = new Circle(30, 30, 25, Color.web("#e0f2f1"));
+
+        // Используем ProgressIndicator вместо Arc для корректного отображения
+        javafx.scene.control.ProgressIndicator pi = new javafx.scene.control.ProgressIndicator(percent / 100.0);
+        pi.setPrefSize(50, 50);
+        pi.setStyle("-fx-progress-color: #00838f;");
+
         Label pct = new Label(String.format("%.0f%%", percent));
         pct.setStyle("-fx-font-weight: bold; -fx-text-fill: #00838f;");
 
@@ -122,7 +125,7 @@ public class StudentDashboardController implements Initializable {
                 new Label("Средний балл: " + String.format("%.1f", p.getAverageScore())) {{ setStyle("-fx-text-fill: #546e7a; -fx-font-size: 12px;"); }}
         );
 
-        stats.getChildren().addAll(new javafx.scene.layout.StackPane(bg, arc, pct), info);
+        stats.getChildren().addAll(pi, info);
         card.getChildren().addAll(title, stats);
         return card;
     }
@@ -133,6 +136,23 @@ public class StudentDashboardController implements Initializable {
             materialsList.setItems(FXCollections.observableArrayList(
                     list.stream().map(m -> m.getSubjectName() + ": " + m.getTitle()).toList()
             ));
+            // Добавляем обработчик двойного клика для открытия материала
+            materialsList.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    int idx = materialsList.getSelectionModel().getSelectedIndex();
+                    if (idx >= 0) {
+                        try {
+                            var materials = materialDao.getAll();
+                            if (idx < materials.size()) {
+                                Material m = materials.get(idx);
+                                java.awt.Desktop.getDesktop().open(new java.io.File(m.getFilePath()));
+                            }
+                        } catch (Exception e) {
+                            new Alert(Alert.AlertType.ERROR, "Не удалось открыть файл: " + e.getMessage()).showAndWait();
+                        }
+                    }
+                }
+            });
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
@@ -146,7 +166,6 @@ public class StudentDashboardController implements Initializable {
         if (session.getStudentId() == null) return;
         achievementsBox.getChildren().clear();
         try {
-            // Проверяем и выдаём новые достижения автоматически
             achievementDao.checkAndAward(session.getStudentId(), session.getUserId());
             var list = achievementDao.getUserAchievements(session.getUserId());
             for (Achievement a : list) {
@@ -178,6 +197,10 @@ public class StudentDashboardController implements Initializable {
     }
 
     private void loadStudyStats() {
+        if (session.getStudentId() == null) {
+            studyStatsLabel.setText("Статистика недоступна");
+            return;
+        }
         try {
             var sessions = studyDao.getByStudent(session.getStudentId());
             int totalSeconds = sessions.stream().mapToInt(StudySession::getDurationSeconds).sum();
@@ -194,7 +217,7 @@ public class StudentDashboardController implements Initializable {
         if (!timerRunning) {
             Subject s = subjectCombo.getValue();
             if (s == null || session.getStudentId() == null) {
-                showAlert("Выберите предмет");
+                showAlert(session.getStudentId() == null ? "Ошибка: не найдена связь со студентом" : "Выберите предмет");
                 return;
             }
             try {
@@ -217,7 +240,6 @@ public class StudentDashboardController implements Initializable {
                 loadAchievements();
                 loadStudyStats();
 
-                // Уведомление о завершении сессии
                 Notification n = new Notification();
                 n.setUserId(session.getUserId());
                 n.setTitle("Сессия завершена");
