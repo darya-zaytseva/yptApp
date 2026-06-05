@@ -21,6 +21,8 @@
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
         <Button onAction="#openCalendar" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="📅 Календарь" />
+        <Button onAction="#openProfile" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="👤 Профиль"/>
+        <Button onAction="#openNotifications" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="🔔 Уведомления"/>
         <Button onAction="#logout" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="Выйти" />
     </HBox>
 

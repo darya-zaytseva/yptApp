@@ -18,6 +18,10 @@
                 <Button onAction="#openMaterials" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="📚 УЧЕБНИКИ" />
                 <Button onAction="#openFriends" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="👥 ДРУЗЬЯ"/>
                 <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#openTasks" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="ЗАДАНИЯ"/>
+                <Button onAction="#openLeaderboard" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="ЛИДЕРЫ"/>
+                <Button onAction="#openProfile" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="ПРОФИЛЬ"/>
+                <Button onAction="#openNotifications" style="-fx-background-color: transparent; -fx-text-fill: #ffcc80; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 16; -fx-cursor: hand;" text="🔔"/>
                 <Button onAction="#logout" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 8 20; -fx-background-radius: 6; -fx-cursor: hand;" text="ВЫХОД" />
             </HBox>
 

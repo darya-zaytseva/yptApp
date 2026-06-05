@@ -55,4 +55,8 @@ public class MainController implements Initializable {
         org.example.yptapp.model.UserSession.clear();
         SceneManager.switchScene("login.fxml", "Авторизация");
     }
+    @FXML private void openTasks() { SceneManager.switchScene("tasks.fxml", "Задания"); }
+    @FXML private void openLeaderboard() { SceneManager.switchScene("leaderboard.fxml", "Таблица лидеров"); }
+    @FXML private void openProfile() { SceneManager.switchScene("profile.fxml", "Профиль"); }
+    @FXML private void openNotifications() { SceneManager.switchScene("notifications.fxml", "Уведомления"); }
 }

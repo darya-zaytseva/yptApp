@@ -266,7 +266,8 @@ public class StudentDashboardController implements Initializable {
     private void openCalendar() {
         SceneManager.switchScene("calendar.fxml", "Календарь");
     }
-
+    @FXML private void openProfile() { SceneManager.switchScene("profile.fxml", "Профиль"); }
+    @FXML private void openNotifications() { SceneManager.switchScene("notifications.fxml", "Уведомления"); }
     @FXML
     private void logout() {
         if (timerRunning) toggleTimer();

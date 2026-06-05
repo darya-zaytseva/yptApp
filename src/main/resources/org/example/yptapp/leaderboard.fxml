@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.yptapp.controller.LeaderboardController">
+    <padding><Insets bottom="20" left="20" right="20" top="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="🏆 Таблица лидеров"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#back" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="← Назад"/>
+    </HBox>
+
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #e0e0e0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+        <columns>
+            <TableColumn fx:id="colName" prefWidth="250" text="Студент"/>
+            <TableColumn fx:id="colHours" prefWidth="150" text="Время учёбы"/>
+            <TableColumn fx:id="colSessions" prefWidth="150" text="Сессий"/>
+        </columns>
+    </TableView>
+</VBox>

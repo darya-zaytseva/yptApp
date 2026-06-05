@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.yptapp.controller.TasksController">
+    <padding><Insets bottom="20" left="20" right="20" top="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" text="📝 Управление заданиями"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#back" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 20;" text="← Назад"/>
+    </HBox>
+
+    <TableView fx:id="table" prefHeight="260" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #e0e0e0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+        <columns>
+            <TableColumn fx:id="colSubject" prefWidth="180" text="Предмет"/>
+            <TableColumn fx:id="colTitle" prefWidth="250" text="Название"/>
+            <TableColumn fx:id="colType" prefWidth="120" text="Тип"/>
+            <TableColumn fx:id="colMaxScore" prefWidth="100" text="Макс. балл"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);">
+        <VBox spacing="6">
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Предмет"/>
+            <ComboBox fx:id="subjectCombo" prefWidth="180" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0;"/>
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Тип"/>
+            <ComboBox fx:id="typeCombo" prefWidth="150" style="-fx-background-radius: 8;"/>
+        </VBox>
+        <VBox spacing="6">
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Название"/>
+            <TextField fx:id="titleField" prefWidth="220" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Макс. балл"/>
+            <TextField fx:id="maxScoreField" prefWidth="100" text="100" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+        </VBox>
+        <VBox spacing="6">
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Дедлайн (YYYY-MM-DD)"/>
+            <TextField fx:id="deadlineField" prefWidth="140" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0; -fx-padding: 10;"/>
+            <Label style="-fx-text-fill: #00838f; -fx-font-weight: bold; -fx-font-size: 13px;" text="Описание"/>
+            <TextArea fx:id="descArea" prefRowCount="2" prefWidth="250" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e0e0e0;"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="12">
+        <Button onAction="#add" style="-fx-background-color: #00838f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 25;" text="➕ Добавить"/>
+        <Button onAction="#update" style="-fx-background-color: #ff7043; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 25;" text="✏ Обновить"/>
+        <Button onAction="#delete" style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 25;" text="🗑 Удалить"/>
+    </HBox>
+</VBox>
